@@ -1,0 +1,461 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    <i class="fas fa-swimming-pool me-2"></i>
+    {{ isEditMode ? 'Edit Pool Data' : 'Add New Pool Data' }}
+  </h4>
+  <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="poolForm" (ngSubmit)="onSubmit()">
+    <!-- Homeowner Information -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-user me-2"></i>Homeowner Information
+        </h5>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label for="homeOwnerName" class="form-label">Homeowner Name *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="homeOwnerName" 
+            formControlName="homeOwnerName"
+            [class.is-invalid]="isFieldInvalid('homeOwnerName')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('homeOwnerName')">
+            {{ getFieldError('homeOwnerName') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label for="phone" class="form-label">Phone *</label>
+          <input 
+            type="tel" 
+            class="form-control" 
+            id="phone" 
+            formControlName="phone"
+            placeholder="1234567890"
+            [class.is-invalid]="isFieldInvalid('phone')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('phone')">
+            {{ getFieldError('phone') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address Information -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-map-marker-alt me-2"></i>Address Information
+        </h5>
+      </div>
+      <div class="col-12">
+        <div class="mb-3">
+          <label for="address" class="form-label">Address *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="address" 
+            formControlName="address"
+            [class.is-invalid]="isFieldInvalid('address')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('address')">
+            {{ getFieldError('address') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="city" class="form-label">City *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="city" 
+            formControlName="city"
+            [class.is-invalid]="isFieldInvalid('city')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('city')">
+            {{ getFieldError('city') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="state" class="form-label">State *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="state" 
+            formControlName="state"
+            [class.is-invalid]="isFieldInvalid('state')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('state')">
+            {{ getFieldError('state') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="zipCode" class="form-label">Zip Code *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="zipCode" 
+            formControlName="zipCode"
+            placeholder="12345"
+            [class.is-invalid]="isFieldInvalid('zipCode')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('zipCode')">
+            {{ getFieldError('zipCode') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pool Specifications -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-ruler-combined me-2"></i>Pool Specifications
+        </h5>
+      </div>
+      <div class="col-md-3">
+        <div class="mb-3">
+          <label for="length" class="form-label">Length (feet) *</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="length" 
+            formControlName="length"
+            [class.is-invalid]="isFieldInvalid('length')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('length')">
+            {{ getFieldError('length') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="mb-3">
+          <label for="width" class="form-label">Width (feet) *</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="width" 
+            formControlName="width"
+            [class.is-invalid]="isFieldInvalid('width')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('width')">
+            {{ getFieldError('width') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="mb-3">
+          <label for="gallons" class="form-label">Gallons *</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="gallons" 
+            formControlName="gallons"
+            [class.is-invalid]="isFieldInvalid('gallons')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('gallons')">
+            {{ getFieldError('gallons') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="mb-3">
+          <label for="howManyInlets" class="form-label">Inlets *</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="howManyInlets" 
+            formControlName="howManyInlets"
+            [class.is-invalid]="isFieldInvalid('howManyInlets')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('howManyInlets')">
+            {{ getFieldError('howManyInlets') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="howManySkimmers" class="form-label">Skimmers *</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="howManySkimmers" 
+            formControlName="howManySkimmers"
+            [class.is-invalid]="isFieldInvalid('howManySkimmers')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('howManySkimmers')">
+            {{ getFieldError('howManySkimmers') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="howManyLadders" class="form-label">Ladders *</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="howManyLadders" 
+            formControlName="howManyLadders"
+            [class.is-invalid]="isFieldInvalid('howManyLadders')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('howManyLadders')">
+            {{ getFieldError('howManyLadders') }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="howManySteps" class="form-label">Steps *</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="howManySteps" 
+            formControlName="howManySteps"
+            [class.is-invalid]="isFieldInvalid('howManySteps')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('howManySteps')">
+            {{ getFieldError('howManySteps') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Information -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-filter me-2"></i>Filter Information
+        </h5>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="filterBrand" class="form-label">Filter Brand</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="filterBrand" 
+            formControlName="filterBrand"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="filterModel" class="form-label">Filter Model</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="filterModel" 
+            formControlName="filterModel"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="filterSerial" class="form-label">Filter Serial</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="filterSerial" 
+            formControlName="filterSerial"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Pump Information -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-tint me-2"></i>Pump Information
+        </h5>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="pumpBrand" class="form-label">Pump Brand</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="pumpBrand" 
+            formControlName="pumpBrand"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="pumpModel" class="form-label">Pump Model</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="pumpModel" 
+            formControlName="pumpModel"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="pumpSerial" class="form-label">Pump Serial</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="pumpSerial" 
+            formControlName="pumpSerial"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Heater Information (NG) -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-fire me-2"></i>Heater Information (NG)
+        </h5>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="heaterBrandNG" class="form-label">Heater Brand NG</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="heaterBrandNG" 
+            formControlName="heaterBrandNG"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="heaterModelNG" class="form-label">Heater Model NG</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="heaterModelNG" 
+            formControlName="heaterModelNG"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="heaterSerialNG" class="form-label">Heater Serial NG</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="heaterSerialNG" 
+            formControlName="heaterSerialNG"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Heater Information (CBMS) -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-fire me-2"></i>Heater Information (CBMS)
+        </h5>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="heaterBrandCBMS" class="form-label">Heater Brand CBMS</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="heaterBrandCBMS" 
+            formControlName="heaterBrandCBMS"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="heaterModelCBMS" class="form-label">Heater Model CBMS</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="heaterModelCBMS" 
+            formControlName="heaterModelCBMS"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="heaterSerialCBMS" class="form-label">Heater Serial CBMS</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="heaterSerialCBMS" 
+            formControlName="heaterSerialCBMS"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Pool Cleaner Information -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="border-bottom pb-2">
+          <i class="fas fa-broom me-2"></i>Pool Cleaner Information
+        </h5>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="poolCleanerBrand" class="form-label">Pool Cleaner Brand</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="poolCleanerBrand" 
+            formControlName="poolCleanerBrand"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="poolCleanerModel" class="form-label">Pool Cleaner Model</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="poolCleanerModel" 
+            formControlName="poolCleanerModel"
+          >
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="poolCleanerSerial" class="form-label">Pool Cleaner Serial</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="poolCleanerSerial" 
+            formControlName="poolCleanerSerial"
+          >
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="close()">
+    <i class="fas fa-times me-2"></i>Cancel
+  </button>
+  <button 
+    type="button" 
+    class="btn btn-primary" 
+    (click)="onSubmit()"
+    [disabled]="loading || poolForm.invalid"
+  >
+    <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+    <i class="fas fa-save me-2" *ngIf="!loading"></i>
+    {{ loading ? 'Saving...' : (isEditMode ? 'Update' : 'Save') }}
+  </button>
+</div>
