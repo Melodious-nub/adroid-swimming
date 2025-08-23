@@ -30,7 +30,7 @@ export class PoolList implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('PoolList component initialized');
+    // console.log('PoolList component initialized');
     this.loadPools();
   }
 
@@ -44,13 +44,13 @@ export class PoolList implements OnInit, OnDestroy {
     this.error = false;
     this.errorMessage = '';
     
-    console.log('Loading pools...');
+    // console.log('Loading pools...');
     
     this.api.getPools()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('Pools loaded successfully:', response);
+          // console.log('Pools loaded successfully:', response);
           this.pools = response.data;
           this.loading = false;
         },
