@@ -18,10 +18,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "functions": {
-    "src/app/**/*.ts": {
-      "maxDuration": 10
-    }
-  }
+  ]
 }
