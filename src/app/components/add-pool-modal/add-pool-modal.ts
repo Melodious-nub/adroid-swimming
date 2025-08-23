@@ -42,11 +42,11 @@ export class AddPoolModal implements OnInit, OnDestroy {
   private initForm(): void {
     this.poolForm = this.fb.group({
       homeOwnerName: ['', [Validators.required]],
-      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      phone: ['', [Validators.required, Validators.minLength(9)]],
       address: ['', [Validators.required]],
       city: ['', [Validators.required]],
       state: ['', [Validators.required]],
-      zipCode: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
+      zipCode: ['', [Validators.required, Validators.minLength(3)]],
       length: ['', [Validators.required, Validators.min(1)]],
       width: ['', [Validators.required, Validators.min(1)]],
       gallons: ['', [Validators.required, Validators.min(1)]],
