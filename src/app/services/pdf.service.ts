@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Pool } from '../models/pool.model';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 
 @Injectable({
   providedIn: 'root'
@@ -10,28 +8,36 @@ export class PdfService {
 
   constructor() { }
 
-  generatePoolPdf(pool: Pool): void {
-    const pdfContent = this.createPdfContent(pool);
-    const element = document.createElement('div');
-    element.innerHTML = pdfContent;
-    element.style.position = 'absolute';
-    element.style.left = '-9999px';
-    element.style.top = '0';
-    element.style.width = '800px'; // Set a fixed width for consistent layout
-    element.style.padding = '20px';
-    element.style.backgroundColor = '#ffffff';
-    document.body.appendChild(element);
+  async generatePoolPdf(pool: Pool): Promise<void> {
+    try {
+      // Dynamically import the heavy libraries
+      const [html2canvas, jsPDF] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf')
+      ]);
 
-    html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      width: 800,
-      height: element.scrollHeight
-    }).then(canvas => {
+      const pdfContent = this.createPdfContent(pool);
+      const element = document.createElement('div');
+      element.innerHTML = pdfContent;
+      element.style.position = 'absolute';
+      element.style.left = '-9999px';
+      element.style.top = '0';
+      element.style.width = '800px'; // Set a fixed width for consistent layout
+      element.style.padding = '20px';
+      element.style.backgroundColor = '#ffffff';
+      document.body.appendChild(element);
+
+      const canvas = await html2canvas.default(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: element.scrollHeight
+      });
+
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdf = new jsPDF.default('p', 'mm', 'a4');
       const imgWidth = 210;
       const pageHeight = 295;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -52,7 +58,10 @@ export class PdfService {
       const fileName = `pool_${pool.homeOwnerName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
       document.body.removeChild(element);
-    });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      throw error;
+    }
   }
 
   printPoolPdf(pool: Pool): void {

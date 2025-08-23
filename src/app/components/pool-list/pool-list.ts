@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, takeUntil } from 'rxjs';
 import { Api } from '../../core/api';
 import { Pool } from '../../models/pool.model';
@@ -10,7 +10,7 @@ import { PdfService } from '../../services/pdf.service';
 @Component({
   selector: 'app-pool-list',
   standalone: true,
-  imports: [CommonModule, NgbModule],
+  imports: [CommonModule],
   templateUrl: './pool-list.html',
   styleUrl: './pool-list.scss'
 })
@@ -119,25 +119,22 @@ export class PoolList implements OnInit, OnDestroy {
     }
   }
 
-  generatePdf(pool: Pool): void {
+  async generatePdf(pool: Pool): Promise<void> {
     if (!pool._id) return;
     
     this.downloadingPdf[pool._id] = true;
     
     try {
-      this.pdfService.generatePoolPdf(pool);
-      // Set a timeout to reset the loading state after PDF generation
-      setTimeout(() => {
-        this.downloadingPdf[pool._id!] = false;
-      }, 2000);
+      await this.pdfService.generatePoolPdf(pool);
     } catch (error: any) {
       console.error('Error generating PDF:', error);
-      this.downloadingPdf[pool._id!] = false;
       alert('Failed to generate PDF. Please try again.');
+    } finally {
+      this.downloadingPdf[pool._id!] = false;
     }
   }
 
-  printPdf(pool: Pool): void {
+  async printPdf(pool: Pool): Promise<void> {
     if (!pool._id) return;
     
     this.printingPdf[pool._id] = true;

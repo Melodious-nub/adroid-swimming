@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, takeUntil } from 'rxjs';
 import { Api } from '../../core/api';
 import { Pool } from '../../models/pool.model';
@@ -9,7 +9,7 @@ import { Pool } from '../../models/pool.model';
 @Component({
   selector: 'app-add-pool-modal',
   standalone: true,
-  imports: [CommonModule, NgbModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './add-pool-modal.html',
   styleUrl: './add-pool-modal.scss'
 })

@@ -54,6 +54,40 @@ The application captures the following pool information:
    ```
 4. Open `http://localhost:4200` in your browser
 
+## Deployment to Vercel
+
+This application is optimized for deployment on Vercel with the following optimizations:
+
+### Bundle Size Optimizations
+- **Lazy Loading**: PDF libraries (`html2canvas` and `jspdf`) are dynamically imported only when needed
+- **Tree Shaking**: Only necessary ng-bootstrap components are imported
+- **Optimized Imports**: Removed unused imports from main app component
+- **Production Build**: Configured with proper optimization settings
+
+### Build Configuration
+- Increased budget limits to accommodate PDF libraries
+- Enabled production optimizations
+- Configured proper output hashing
+- Disabled source maps in production
+
+### Vercel Configuration
+The `vercel.json` file is configured for optimal Angular deployment:
+- Static build configuration
+- Proper routing for SPA
+- Asset handling
+- Function timeout settings
+
+### Deployment Steps
+1. Push your code to a Git repository (GitHub, GitLab, etc.)
+2. Connect your repository to Vercel
+3. Vercel will automatically detect the Angular project and use the optimized build settings
+4. The application will be deployed with all optimizations applied
+
+### Bundle Size
+The initial bundle size has been optimized to stay within Vercel's limits:
+- **Before optimization**: ~1.22 MB (exceeded 1MB limit)
+- **After optimization**: Should be under 1MB with lazy loading of PDF libraries
+
 ## API Configuration
 
 Update the API base URL in `src/app/core/api.ts` to match your backend server:
