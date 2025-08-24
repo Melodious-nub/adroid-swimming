@@ -18,88 +18,98 @@
   </div>
 
   <!-- Error Message -->
-  <div class="row" *ngIf="error">
-    <div class="col-12">
-      <div class="alert alert-warning" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        {{ errorMessage }}
+  @if (error) {
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-warning" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ errorMessage }}
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Loading Spinner -->
-  <div class="row" *ngIf="loading">
-    <div class="col-12 text-center">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+  @if (loading) {
+    <div class="row">
+      <div class="col-12 text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading pool data...</p>
       </div>
-      <p class="mt-2">Loading pool data...</p>
     </div>
-  </div>
+  }
 
      <!-- Show table only when there is data -->
-   <div class="row" *ngIf="pools && pools.length > 0 && !loading">
-     <div class="col-12">
-       <div class="table-responsive">
-         <table class="table table-striped table-hover text-center">
-           <thead class="table-dark">
-             <tr>
-               <th class="text-nowrap">Homeowner</th>
-               <th class="text-nowrap d-none d-md-table-cell">Phone</th>
-               <th class="text-nowrap d-none d-lg-table-cell">Address</th>
-               <th class="text-nowrap d-none d-md-table-cell">City</th>
-               <th class="text-nowrap d-none d-lg-table-cell">State</th>
-               <th class="text-nowrap">Pool Size</th>
-               <th class="text-nowrap d-none d-lg-table-cell">Created</th>
-               <th class="text-nowrap">Actions</th>
-             </tr>
-           </thead>
-           <tbody>
-             <tr *ngFor="let pool of pools">
-               <td class="text-nowrap">
-                 <div class="fw-bold">{{ pool.homeOwnerName }}</div>
-                 <div class="small text-muted d-md-none">{{ pool.phone }}</div>
-                 <div class="small text-muted d-lg-none">{{ pool.city }}, {{ pool.state }}</div>
-               </td>
-               <td class="text-nowrap d-none d-md-table-cell">{{ pool.phone }}</td>
-               <td class="text-nowrap d-none d-lg-table-cell">{{ pool.address }}</td>
-               <td class="text-nowrap d-none d-md-table-cell">{{ pool.city }}</td>
-               <td class="text-nowrap d-none d-lg-table-cell">{{ pool.state }}</td>
-               <td class="text-nowrap">{{ pool.length }}' x {{ pool.width }}'<br><small class="text-muted">({{ pool.gallons }} gal)</small></td>
-               <td class="text-nowrap d-none d-lg-table-cell">{{ pool.createdAt | date:'short' }}</td>
-               <td class="text-nowrap">
-                 <div class="btn-group btn-group-sm" role="group">
-                   <button class="btn btn-outline-primary" (click)="openEditModal(pool)" title="Edit">
-                     <i class="fas fa-edit"></i>
-                   </button>
-                   <button class="btn btn-outline-success" 
-                           (click)="generatePdf(pool)" 
-                           [disabled]="downloadingPdf[pool._id!]"
-                           title="Download PDF">
-                     <i class="fas" [class.fa-download]="!downloadingPdf[pool._id!]" [class.fa-spinner]="downloadingPdf[pool._id!]" [class.fa-spin]="downloadingPdf[pool._id!]"></i>
-                   </button>
-                   <button class="btn btn-outline-info" 
-                           (click)="printPdf(pool)" 
-                           [disabled]="printingPdf[pool._id!]"
-                           title="Print PDF">
-                     <i class="fas" [class.fa-print]="!printingPdf[pool._id!]" [class.fa-spinner]="printingPdf[pool._id!]" [class.fa-spin]="printingPdf[pool._id!]"></i>
-                   </button>
-                   <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
-                     <i class="fas fa-trash"></i>
-                   </button>
-                 </div>
-               </td>
-             </tr>
-           </tbody>
-         </table>
+   @if (pools && pools.length > 0 && !loading) {
+     <div class="row">
+       <div class="col-12">
+         <div class="table-responsive">
+           <table class="table table-striped table-hover text-center">
+             <thead class="table-dark">
+               <tr>
+                 <th class="text-nowrap">Homeowner</th>
+                 <th class="text-nowrap d-none d-md-table-cell">Phone</th>
+                 <th class="text-nowrap d-none d-lg-table-cell">Address</th>
+                 <th class="text-nowrap d-none d-md-table-cell">City</th>
+                 <th class="text-nowrap d-none d-lg-table-cell">State</th>
+                 <th class="text-nowrap">Pool Size</th>
+                 <th class="text-nowrap d-none d-lg-table-cell">Created</th>
+                 <th class="text-nowrap">Actions</th>
+               </tr>
+             </thead>
+             <tbody>
+               @for (pool of pools; track pool._id ?? $index) {
+                 <tr>
+                   <td class="text-nowrap">
+                     <div class="fw-bold">{{ pool.homeOwnerName }}</div>
+                     <div class="small text-muted d-md-none">{{ pool.phone }}</div>
+                     <div class="small text-muted d-lg-none">{{ pool.city }}, {{ pool.state }}</div>
+                   </td>
+                   <td class="text-nowrap d-none d-md-table-cell">{{ pool.phone }}</td>
+                   <td class="text-nowrap d-none d-lg-table-cell">{{ pool.address }}</td>
+                   <td class="text-nowrap d-none d-md-table-cell">{{ pool.city }}</td>
+                   <td class="text-nowrap d-none d-lg-table-cell">{{ pool.state }}</td>
+                   <td class="text-nowrap">{{ pool.length }}' x {{ pool.width }}'<br><small class="text-muted">({{ pool.gallons }} gal)</small></td>
+                   <td class="text-nowrap d-none d-lg-table-cell">{{ pool.createdAt | date:'short' }}</td>
+                   <td class="text-nowrap">
+                     <div class="btn-group btn-group-sm" role="group">
+                       <button class="btn btn-outline-primary" (click)="openEditModal(pool)" title="Edit">
+                         <i class="fas fa-edit"></i>
+                       </button>
+                       <button class="btn btn-outline-success" 
+                               (click)="generatePdf(pool)" 
+                               [disabled]="downloadingPdf[pool._id!]"
+                               title="Download PDF">
+                         <i class="fas" [class.fa-download]="!downloadingPdf[pool._id!]" [class.fa-spinner]="downloadingPdf[pool._id!]" [class.fa-spin]="downloadingPdf[pool._id!]"></i>
+                       </button>
+                       <button class="btn btn-outline-info" 
+                               (click)="printPdf(pool)" 
+                               [disabled]="printingPdf[pool._id!]"
+                               title="Print PDF">
+                         <i class="fas" [class.fa-print]="!printingPdf[pool._id!]" [class.fa-spinner]="printingPdf[pool._id!]" [class.fa-spin]="printingPdf[pool._id!]"></i>
+                       </button>
+                       <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
+                         <i class="fas fa-trash"></i>
+                       </button>
+                     </div>
+                   </td>
+                 </tr>
+               }
+             </tbody>
+           </table>
+         </div>
        </div>
      </div>
-   </div>
+   }
 
      <!-- Show message when no data is available -->
-   <div class="text-center py-5" *ngIf="(!pools || pools.length === 0) && !loading && !error">
-     <i class="fas fa-swimming-pool fa-3x text-muted mb-3"></i>
-     <h4 class="text-muted">No pool data found</h4>
-     <p class="text-muted">Click the "Add Pool Data" button to get started.</p>
-   </div>
+   @if ((!pools || pools.length === 0) && !loading && !error) {
+     <div class="text-center py-5">
+       <i class="fas fa-swimming-pool fa-3x text-muted mb-3"></i>
+       <h4 class="text-muted">No pool data found</h4>
+       <p class="text-muted">Click the "Add Pool Data" button to get started.</p>
+     </div>
+   }
 </div>
