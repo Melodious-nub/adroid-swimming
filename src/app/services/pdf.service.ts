@@ -23,6 +23,13 @@ export class PdfService {
     // Build the exact same PDF and print it to guarantee parity
     this.buildPdf(pool)
       .then((pdf) => {
+        // Mobile browsers are more reliable opening a new tab with data URL
+        if (this.isMobileDevice()) {
+          const dataUrl = (pdf as any).output('dataurlstring');
+          window.open(dataUrl, '_blank');
+          return;
+        }
+
         if (typeof (pdf as any).autoPrint === 'function') {
           (pdf as any).autoPrint();
         }
@@ -165,7 +172,7 @@ export class PdfService {
     y = this.drawStaticLine(pdf, 'Type of Heater:  Natural Gas   Propane   Electric Heat Pump', margin, contentRight, y);
     y = this.drawMultiColumnLine(pdf,
       [
-        { label: 'Heater Brand (NG)', value: String(pool.heaterBrandNG || '') },
+        { label: 'Heater Brand', value: String(pool.heaterBrandNG || '') },
         { label: 'Model', value: String(pool.heaterModelNG || '') },
         { label: 'Serial #', value: String(pool.heaterSerialNG || '') }
       ],
@@ -173,7 +180,7 @@ export class PdfService {
     y = this.drawStaticLine(pdf, 'Type of Chemical Feeder:  Chlorine   Bromine   Mineral Salt', margin, contentRight, y);
     y = this.drawMultiColumnLine(pdf,
       [
-        { label: 'Heater Brand (CBMS)', value: String(pool.heaterBrandCBMS || '') },
+        { label: 'Heater Brand', value: String(pool.heaterBrandCBMS || '') },
         { label: 'Model', value: String(pool.heaterModelCBMS || '') },
         { label: 'Serial #', value: String(pool.heaterSerialCBMS || '') }
       ],
@@ -275,7 +282,9 @@ export class PdfService {
   }
 
   private async loadImageAsDataUrl(path: string): Promise<string> {
-    const response = await fetch(path, { cache: 'no-store' });
+    // Support local dev and production: try absolute first, then relative
+    const absolutePath = path.startsWith('/') ? path : `/${path}`;
+    const response = await fetch(absolutePath, { cache: 'no-store' });
     if (!response.ok) throw new Error('Failed to load image');
     const blob = await response.blob();
     return await new Promise<string>((resolve, reject) => {
@@ -284,6 +293,11 @@ export class PdfService {
       reader.onerror = () => reject(new Error('Failed to read image'));
       reader.readAsDataURL(blob);
     });
+  }
+
+  private isMobileDevice(): boolean {
+    const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
+    return /android|iphone|ipad|ipod/i.test(ua);
   }
 
   // (Cleanup) Removed unused HTML-based print helpers; PDF is the single source of truth
