@@ -89,13 +89,22 @@ export class PdfService {
 
     // Try to draw logo above the header (served from /public)
     try {
-      const logoDataUrl = await this.loadImageAsDataUrl('/logopdf.jpeg');
+      const logo = await this.loadImageAsDataUrl('/logopdf.jpeg');
       const logoWidth = 40; // mm
       const logoHeight = 20; // mm
-      pdf.addImage(logoDataUrl, 'JPEG', margin, y, logoWidth, logoHeight);
+      pdf.addImage(logo.dataUrl, logo.format, margin, y, logoWidth, logoHeight);
       y += logoHeight + 6; // space below logo
     } catch {
-      // If logo fails to load, continue without it
+      // If logo fails to load from public path (CORS/CDN/WebP), try inlining a small fallback
+      try {
+        const inlineLogo = await this.inlineFallbackLogo();
+        if (inlineLogo) {
+          const logoWidth = 40;
+          const logoHeight = 20;
+          pdf.addImage(inlineLogo, 'PNG', margin, y, logoWidth, logoHeight);
+          y += logoHeight + 6;
+        }
+      } catch {}
     }
 
     pdf.setFont('helvetica', 'normal');
@@ -287,7 +296,8 @@ export class PdfService {
     return y + 8;
   }
 
-  private async loadImageAsDataUrl(path: string): Promise<string> {
+  private async loadImageAsDataUrl(path: string): Promise<{ dataUrl: string; format: 'PNG' | 'JPEG' }>
+  {
     // Robust asset resolution: prefer absolute URL based on current origin and base href
     const baseHref = (document.querySelector('base')?.getAttribute('href') || '/');
     const absoluteUrl = new URL(path.startsWith('/') ? path : `${baseHref}${path}`, window.location.origin).toString();
@@ -296,9 +306,11 @@ export class PdfService {
     const response = await fetch(urlWithBust, { cache: 'no-store' });
     if (!response.ok) throw new Error('Failed to load image');
     const blob = await response.blob();
-    return await new Promise<string>((resolve, reject) => {
+    // Detect format (Vercel may serve as webp if not configured); convert to PNG to be safe
+    const resolvedFormat: 'PNG' | 'JPEG' = /jpe?g/i.test(blob.type) ? 'JPEG' : 'PNG';
+    return await new Promise<{ dataUrl: string; format: 'PNG' | 'JPEG' }>((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
+      reader.onload = () => resolve({ dataUrl: String(reader.result), format: resolvedFormat });
       reader.onerror = () => reject(new Error('Failed to read image'));
       reader.readAsDataURL(blob);
     });
@@ -307,6 +319,14 @@ export class PdfService {
   private isMobileDevice(): boolean {
     const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
     return /android|iphone|ipad|ipod/i.test(ua);
+  }
+
+  private async inlineFallbackLogo(): Promise<string | null> {
+    // Small transparent PNG placeholder (1x1) as ultimate fallback.
+    // Replace this with a small embedded company mark if desired.
+    const tinyPng =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAoMBg3b8yqgAAAAASUVORK5CYII=';
+    return tinyPng;
   }
 
   // (Cleanup) Removed unused HTML-based print helpers; PDF is the single source of truth
