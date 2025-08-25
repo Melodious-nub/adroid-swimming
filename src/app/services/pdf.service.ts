@@ -23,13 +23,21 @@ export class PdfService {
     // Build the exact same PDF and print it to guarantee parity
     this.buildPdf(pool)
       .then((pdf) => {
-        // Mobile browsers are more reliable opening a new tab with data URL
+        // Mobile-friendly behavior: open PDF in a new tab using a Blob URL.
         if (this.isMobileDevice()) {
-          const dataUrl = (pdf as any).output('dataurlstring');
-          window.open(dataUrl, '_blank');
+          const blob = (pdf as any).output('blob');
+          const blobUrl = URL.createObjectURL(blob);
+          const newWin = window.open(blobUrl, '_blank');
+          if (!newWin) {
+            // Popup blocked fallback: navigate current tab
+            window.location.href = blobUrl;
+          }
+          // Revoke later to avoid memory leaks (cannot revoke immediately)
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
           return;
         }
 
+        // Desktop: auto print via hidden iframe to keep scaling consistent
         if (typeof (pdf as any).autoPrint === 'function') {
           (pdf as any).autoPrint();
         }
@@ -47,7 +55,6 @@ export class PdfService {
           try {
             const cw = frame.contentWindow;
             if (cw) {
-              // Remove only after the user finishes interacting with the print dialog
               cw.onafterprint = () => {
                 try { document.body.removeChild(frame); } catch {}
               };
@@ -55,7 +62,6 @@ export class PdfService {
               cw.print();
             }
           } catch {}
-          // Do not auto-remove now; leaving the iframe prevents blank page issue
           // Fallback cleanup in case onafterprint never fires
           setTimeout(() => {
             if (document.body.contains(frame)) {
@@ -282,9 +288,12 @@ export class PdfService {
   }
 
   private async loadImageAsDataUrl(path: string): Promise<string> {
-    // Support local dev and production: try absolute first, then relative
-    const absolutePath = path.startsWith('/') ? path : `/${path}`;
-    const response = await fetch(absolutePath, { cache: 'no-store' });
+    // Robust asset resolution: prefer absolute URL based on current origin and base href
+    const baseHref = (document.querySelector('base')?.getAttribute('href') || '/');
+    const absoluteUrl = new URL(path.startsWith('/') ? path : `${baseHref}${path}`, window.location.origin).toString();
+    const bust = `v=${Date.now()}`;
+    const urlWithBust = absoluteUrl.includes('?') ? `${absoluteUrl}&${bust}` : `${absoluteUrl}?${bust}`;
+    const response = await fetch(urlWithBust, { cache: 'no-store' });
     if (!response.ok) throw new Error('Failed to load image');
     const blob = await response.blob();
     return await new Promise<string>((resolve, reject) => {
