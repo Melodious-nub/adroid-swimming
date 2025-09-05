@@ -300,20 +300,65 @@ export class PdfService {
   {
     // Robust asset resolution: prefer absolute URL based on current origin and base href
     const baseHref = (document.querySelector('base')?.getAttribute('href') || '/');
-    const absoluteUrl = new URL(path.startsWith('/') ? path : `${baseHref}${path}`, window.location.origin).toString();
+    const toAbsolute = (p: string) => new URL(p.startsWith('/') ? p : `${baseHref}${p}`, window.location.origin).toString();
     const bust = `v=${Date.now()}`;
-    const urlWithBust = absoluteUrl.includes('?') ? `${absoluteUrl}&${bust}` : `${absoluteUrl}?${bust}`;
-    const response = await fetch(urlWithBust, { cache: 'no-store' });
-    if (!response.ok) throw new Error('Failed to load image');
-    const blob = await response.blob();
-    // Detect format (Vercel may serve as webp if not configured); convert to PNG to be safe
-    const resolvedFormat: 'PNG' | 'JPEG' = /jpe?g/i.test(blob.type) ? 'JPEG' : 'PNG';
-    return await new Promise<{ dataUrl: string; format: 'PNG' | 'JPEG' }>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve({ dataUrl: String(reader.result), format: resolvedFormat });
-      reader.onerror = () => reject(new Error('Failed to read image'));
-      reader.readAsDataURL(blob);
-    });
+    const withBust = (u: string) => (u.includes('?') ? `${u}&${bust}` : `${u}?${bust}`);
+
+    // Try the provided path, then common alternative extensions (helps if the file is .png or .jpg)
+    const candidatePaths: string[] = (() => {
+      const dot = path.lastIndexOf('.');
+      const base = dot > -1 ? path.slice(0, dot) : path;
+      const candidates = new Set<string>([path, `${base}.jpeg`, `${base}.jpg`, `${base}.png`, `${base}.webp`]);
+      return Array.from(candidates);
+    })();
+
+    let blob: Blob | null = null;
+    let lastError: any = null;
+    for (const p of candidatePaths) {
+      try {
+        const response = await fetch(withBust(toAbsolute(p)), { cache: 'no-store' });
+        if (response.ok) {
+          blob = await response.blob();
+          break;
+        }
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    if (!blob) {
+      throw lastError || new Error('Failed to load image');
+    }
+
+    // Convert any loaded format (e.g., webp, jpeg) to PNG via canvas to ensure jsPDF compatibility
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+      const dataUrl: string = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              reject(new Error('Canvas not supported'));
+              return;
+            }
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+          } catch (e) {
+            reject(e);
+          }
+        };
+        img.onerror = () => reject(new Error('Failed to decode image'));
+        img.src = objectUrl;
+      });
+      return { dataUrl, format: 'PNG' };
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
   }
 
   private isMobileDevice(): boolean {

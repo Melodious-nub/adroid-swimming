@@ -1,5 +1,5 @@
 export interface Pool {
-  _id?: string;
+  id?: string;
   homeOwnerName: string;
   phone: number;
   address: string;

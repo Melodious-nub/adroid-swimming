@@ -7,12 +7,20 @@ import { Pool, PoolResponse } from '../models/pool.model';
   providedIn: 'root'
 })
 export class Api {
-  private readonly baseUrl = 'https://adroid-swimming-backend.onrender.com/api';
+  private readonly baseUrl = 'http://localhost:3000/api';
 
   constructor(private http: HttpClient) {}
 
+  login(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/login`, data);
+  }
+
   getPools(): Observable<PoolResponse> {
     return this.http.get<PoolResponse>(`${this.baseUrl}/pools`);
+  }
+
+  searchPools(q: string): Observable<PoolResponse> {
+    return this.http.get<PoolResponse>(`${this.baseUrl}/pools/search`, { params: { q } });
   }
 
   postPool(pool: Pool): Observable<Pool> {
@@ -20,7 +28,7 @@ export class Api {
   }
 
   putPool(pool: Pool): Observable<Pool> {
-    return this.http.put<Pool>(`${this.baseUrl}/pools/${pool._id}`, pool);
+    return this.http.put<Pool>(`${this.baseUrl}/pools/${pool.id}`, pool);
   }
 
   deletePool(id: string): Observable<any> {

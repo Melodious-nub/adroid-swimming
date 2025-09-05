@@ -77,15 +77,16 @@ export class AddPoolModal implements OnInit, OnDestroy {
       this.loading = true;
       const poolData = this.poolForm.value;
 
-      const request = this.isEditMode && this.pool?._id
-        ? this.api.putPool({ ...poolData, _id: this.pool._id })
+      const isUpdate = this.isEditMode && !!this.pool?.id;
+      const request = isUpdate
+        ? this.api.putPool({ ...poolData, id: this.pool!.id! })
         : this.api.postPool(poolData);
 
       request.pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             this.loading = false;
-            this.activeModal.close(true);
+            this.activeModal.close(isUpdate ? 'updated' : 'created');
           },
           error: (error) => {
             console.error('Error saving pool:', error);

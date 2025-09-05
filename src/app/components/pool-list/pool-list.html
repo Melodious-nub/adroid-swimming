@@ -1,115 +1,136 @@
 <div class="container-fluid">
-  <!-- Header with Add Button -->
-  <div class="row mb-4">
+  <div class="row">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-list me-2"></i>Pool List</h2>
-        <div class="btn-group" role="group">
-          <button class="btn btn-outline-secondary" (click)="loadPools()" [disabled]="loading" title="Refresh Pool List">
-            <i class="fas fa-sync-alt me-2" [class.fa-spin]="loading"></i>
-            {{ loading ? 'Refreshing...' : 'Refresh' }}
-          </button>
-          <button class="btn btn-primary" (click)="openAddModal()">
-            <i class="fas fa-plus me-2"></i>Add Pool Data
-          </button>
-        </div>
+      <div class="position-relative mt-3">
+        <h1 class="text-center m-0">
+          <i class="fas fa-swimming-pool me-2"></i>
+          {{ title }}
+        </h1>
+        <button class="btn btn-outline-danger position-absolute top-50 end-0 translate-middle-y" (click)="logout()" title="Logout">
+          <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </button>
       </div>
+      <div class="container-fluid">
+        <!-- Pools heading -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <h2 class="mb-0"><i class="fas fa-list me-2"></i>Pools</h2>
+          </div>
+        </div>
+
+        <!-- Search left, actions right -->
+        <div class="row mb-3 g-2 align-items-center">
+          <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+            <input type="search" class="form-control" placeholder="Search by homeowner or city..." (input)="onSearch($event.target.value)">
+          </div>
+          <div class="col-12 col-sm-4 col-md-6 col-lg-8 d-flex justify-content-md-end gap-2">
+            <button class="btn btn-outline-secondary" (click)="loadPools()" [disabled]="loading" title="Refresh Pool List">
+              <i class="fas fa-sync-alt me-2" [class.fa-spin]="loading"></i>
+              {{ loading ? 'Refreshing...' : 'Refresh' }}
+            </button>
+            <button class="btn btn-primary" (click)="openAddModal()">
+              <i class="fas fa-plus me-2"></i>Add Pool Data
+            </button>
+          </div>
+        </div>
+      
+        <!-- Error Message -->
+        @if (error) {
+          <div class="row">
+            <div class="col-12">
+              <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ errorMessage }}
+              </div>
+            </div>
+          </div>
+        }
+      
+        <!-- Loading Spinner -->
+        @if (loading) {
+          <div class="row">
+            <div class="col-12 text-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2">Loading pool data...</p>
+            </div>
+          </div>
+        }
+      
+           <!-- Show table only when there is data -->
+         @if (pools && pools.length > 0 && !loading) {
+           <div class="row">
+             <div class="col-12">
+               <div class="table-responsive">
+                 <table class="table table-striped table-hover text-center">
+                   <thead class="table-dark">
+                     <tr>
+                       <th class="text-nowrap">Homeowner</th>
+                       <th class="text-nowrap d-none d-md-table-cell">Phone</th>
+                       <th class="text-nowrap d-none d-lg-table-cell">Address</th>
+                       <th class="text-nowrap d-none d-md-table-cell">City</th>
+                       <th class="text-nowrap d-none d-lg-table-cell">State</th>
+                       <th class="text-nowrap">Pool Size</th>
+                       <th class="text-nowrap d-none d-lg-table-cell">Created</th>
+                       <th class="text-nowrap">Actions</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     @for (pool of pools; track pool.id ?? $index) {
+                       <tr>
+                         <td class="text-nowrap">
+                           <div class="fw-bold">{{ pool.homeOwnerName }}</div>
+                           <div class="small text-muted d-md-none">{{ pool.phone }}</div>
+                           <div class="small text-muted d-lg-none">{{ pool.city }}, {{ pool.state }}</div>
+                         </td>
+                         <td class="text-nowrap d-none d-md-table-cell">{{ pool.phone }}</td>
+                         <td class="text-nowrap d-none d-lg-table-cell">{{ pool.address }}</td>
+                         <td class="text-nowrap d-none d-md-table-cell">{{ pool.city }}</td>
+                         <td class="text-nowrap d-none d-lg-table-cell">{{ pool.state }}</td>
+                         <td class="text-nowrap">{{ pool.length }}' x {{ pool.width }}'<br><small class="text-muted">({{ pool.gallons }} gal)</small></td>
+                         <td class="text-nowrap d-none d-lg-table-cell">{{ pool.createdAt | date:'short' }}</td>
+                         <td class="text-nowrap">
+                           <div class="btn-group btn-group-sm" role="group">
+                             <button class="btn btn-outline-primary" (click)="openEditModal(pool)" title="Edit">
+                               <i class="fas fa-edit"></i>
+                             </button>
+                             <button class="btn btn-outline-success" 
+                                     (click)="generatePdf(pool)" 
+                                     [disabled]="downloadingPdf[pool.id!]"
+                                     title="Download PDF">
+                               <i class="fas" [class.fa-download]="!downloadingPdf[pool.id!]" [class.fa-spinner]="downloadingPdf[pool.id!]" [class.fa-spin]="downloadingPdf[pool.id!]"></i>
+                             </button>
+                             <button class="btn btn-outline-info" 
+                                     (click)="printPdf(pool)" 
+                                     [disabled]="printingPdf[pool.id!]"
+                                     title="Print PDF">
+                               <i class="fas" [class.fa-print]="!printingPdf[pool.id!]" [class.fa-spinner]="printingPdf[pool.id!]" [class.fa-spin]="printingPdf[pool.id!]"></i>
+                             </button>
+                             <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
+                               <i class="fas fa-trash"></i>
+                             </button>
+                           </div>
+                         </td>
+                       </tr>
+                     }
+                   </tbody>
+                 </table>
+               </div>
+             </div>
+           </div>
+         }
+      
+           <!-- Show message when no data is available -->
+         @if ((!pools || pools.length === 0) && !loading && !error) {
+           <div class="text-center py-5">
+             <i class="fas fa-swimming-pool fa-3x text-muted mb-3"></i>
+             <h4 class="text-muted">No pool data found</h4>
+             <p class="text-muted">Click the "Add Pool Data" button to get started.</p>
+           </div>
+         }
+      </div>      
     </div>
   </div>
-
-  <!-- Error Message -->
-  @if (error) {
-    <div class="row">
-      <div class="col-12">
-        <div class="alert alert-warning" role="alert">
-          <i class="fas fa-exclamation-triangle me-2"></i>
-          {{ errorMessage }}
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- Loading Spinner -->
-  @if (loading) {
-    <div class="row">
-      <div class="col-12 text-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="mt-2">Loading pool data...</p>
-      </div>
-    </div>
-  }
-
-     <!-- Show table only when there is data -->
-   @if (pools && pools.length > 0 && !loading) {
-     <div class="row">
-       <div class="col-12">
-         <div class="table-responsive">
-           <table class="table table-striped table-hover text-center">
-             <thead class="table-dark">
-               <tr>
-                 <th class="text-nowrap">Homeowner</th>
-                 <th class="text-nowrap d-none d-md-table-cell">Phone</th>
-                 <th class="text-nowrap d-none d-lg-table-cell">Address</th>
-                 <th class="text-nowrap d-none d-md-table-cell">City</th>
-                 <th class="text-nowrap d-none d-lg-table-cell">State</th>
-                 <th class="text-nowrap">Pool Size</th>
-                 <th class="text-nowrap d-none d-lg-table-cell">Created</th>
-                 <th class="text-nowrap">Actions</th>
-               </tr>
-             </thead>
-             <tbody>
-               @for (pool of pools; track pool._id ?? $index) {
-                 <tr>
-                   <td class="text-nowrap">
-                     <div class="fw-bold">{{ pool.homeOwnerName }}</div>
-                     <div class="small text-muted d-md-none">{{ pool.phone }}</div>
-                     <div class="small text-muted d-lg-none">{{ pool.city }}, {{ pool.state }}</div>
-                   </td>
-                   <td class="text-nowrap d-none d-md-table-cell">{{ pool.phone }}</td>
-                   <td class="text-nowrap d-none d-lg-table-cell">{{ pool.address }}</td>
-                   <td class="text-nowrap d-none d-md-table-cell">{{ pool.city }}</td>
-                   <td class="text-nowrap d-none d-lg-table-cell">{{ pool.state }}</td>
-                   <td class="text-nowrap">{{ pool.length }}' x {{ pool.width }}'<br><small class="text-muted">({{ pool.gallons }} gal)</small></td>
-                   <td class="text-nowrap d-none d-lg-table-cell">{{ pool.createdAt | date:'short' }}</td>
-                   <td class="text-nowrap">
-                     <div class="btn-group btn-group-sm" role="group">
-                       <button class="btn btn-outline-primary" (click)="openEditModal(pool)" title="Edit">
-                         <i class="fas fa-edit"></i>
-                       </button>
-                       <button class="btn btn-outline-success" 
-                               (click)="generatePdf(pool)" 
-                               [disabled]="downloadingPdf[pool._id!]"
-                               title="Download PDF">
-                         <i class="fas" [class.fa-download]="!downloadingPdf[pool._id!]" [class.fa-spinner]="downloadingPdf[pool._id!]" [class.fa-spin]="downloadingPdf[pool._id!]"></i>
-                       </button>
-                       <button class="btn btn-outline-info" 
-                               (click)="printPdf(pool)" 
-                               [disabled]="printingPdf[pool._id!]"
-                               title="Print PDF">
-                         <i class="fas" [class.fa-print]="!printingPdf[pool._id!]" [class.fa-spinner]="printingPdf[pool._id!]" [class.fa-spin]="printingPdf[pool._id!]"></i>
-                       </button>
-                       <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
-                         <i class="fas fa-trash"></i>
-                       </button>
-                     </div>
-                   </td>
-                 </tr>
-               }
-             </tbody>
-           </table>
-         </div>
-       </div>
-     </div>
-   }
-
-     <!-- Show message when no data is available -->
-   @if ((!pools || pools.length === 0) && !loading && !error) {
-     <div class="text-center py-5">
-       <i class="fas fa-swimming-pool fa-3x text-muted mb-3"></i>
-       <h4 class="text-muted">No pool data found</h4>
-       <p class="text-muted">Click the "Add Pool Data" button to get started.</p>
-     </div>
-   }
 </div>
+
