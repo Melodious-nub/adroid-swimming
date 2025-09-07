@@ -17,7 +17,7 @@ import Swal from 'sweetalert2';
   styleUrl: './pool-list.scss'
 })
 export class PoolList implements OnInit, OnDestroy {
-  title = 'Adroid Swimming Pool Management';
+  title = 'Adroit Swimming Pool Management';
   pools: Pool[] = [];
   loading = false;
   error = false;

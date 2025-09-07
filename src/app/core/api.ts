@@ -7,7 +7,7 @@ import { Pool, PoolResponse } from '../models/pool.model';
   providedIn: 'root'
 })
 export class Api {
-  private readonly baseUrl = 'http://localhost:3000/api';
+  private readonly baseUrl = 'https://data.bdswimmingpool.com/api';
 
   constructor(private http: HttpClient) {}
 
