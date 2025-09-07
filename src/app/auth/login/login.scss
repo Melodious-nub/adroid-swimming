@@ -2,16 +2,55 @@
   min-height: 100vh;
 }
 
-.card {
-  border-radius: 10px;
+.auth-wrapper {
+  width: 100%;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  margin: 0 auto;
 }
 
 .form-control {
   border-radius: 8px;
+  min-height: 44px;
 }
 
 button.btn {
   border-radius: 8px;
+  min-height: 44px;
 }
 
+/* Small phones */
+@media (max-width: 360px) {
+  .auth-card {
+    max-width: 100%;
+  }
+
+  .card-body {
+    padding: 16px !important;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Larger phones and small tablets */
+@media (min-width: 361px) and (max-width: 575.98px) {
+  .card-body {
+    padding: 20px !important;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
 
