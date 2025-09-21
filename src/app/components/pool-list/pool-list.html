@@ -1,20 +1,28 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">
-      <div class="position-relative mt-3">
+      <div class="position-relative">
         <h1 class="text-center m-0">
           <i class="fas fa-swimming-pool me-2"></i>
           {{ title }}
         </h1>
-        <button class="btn btn-outline-danger position-absolute top-50 end-0 translate-middle-y" (click)="logout()" title="Logout">
+        <button class="btn btn-outline-danger position-absolute top-50 end-0 translate-middle-y mt-2" (click)="logout()" title="Logout">
           <i class="fas fa-sign-out-alt me-2"></i>Logout
         </button>
       </div>
       <div class="container-fluid">
         <!-- Pools heading -->
-        <div class="row mb-3">
-          <div class="col-12">
+        <div class="row mb-3 align-items-center">
+          <div class="col">
             <h2 class="mb-0"><i class="fas fa-list me-2"></i>Pools</h2>
+          </div>
+          <div class="col-auto">
+            @if (isAdmin) {
+              <button class="btn btn-outline-primary" (click)="openAddMemberModal()" title="Add a new member">
+                <i class="fas fa-user-plus me-2"></i>Add Member
+              </button>
+            } @else {
+            }
           </div>
         </div>
 
@@ -31,6 +39,7 @@
             <button class="btn btn-primary" (click)="openAddModal()">
               <i class="fas fa-plus me-2"></i>Add Pool Data
             </button>
+            
           </div>
         </div>
       
@@ -92,9 +101,11 @@
                          <td class="text-nowrap d-none d-lg-table-cell">{{ pool.createdAt | date:'short' }}</td>
                          <td class="text-nowrap">
                            <div class="btn-group btn-group-sm" role="group">
-                             <button class="btn btn-outline-primary" (click)="openEditModal(pool)" title="Edit">
+                            @if (isAdmin) {
+                              <button class="btn btn-outline-primary" (click)="openEditModal(pool)" title="Edit">
                                <i class="fas fa-edit"></i>
-                             </button>
+                              </button>
+                            }
                              <button class="btn btn-outline-success" 
                                      (click)="generatePdf(pool)" 
                                      [disabled]="downloadingPdf[pool.id!]"
@@ -107,9 +118,11 @@
                                      title="Print PDF">
                                <i class="fas" [class.fa-print]="!printingPdf[pool.id!]" [class.fa-spinner]="printingPdf[pool.id!]" [class.fa-spin]="printingPdf[pool.id!]"></i>
                              </button>
-                             <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
-                               <i class="fas fa-trash"></i>
-                             </button>
+                            @if (isAdmin) {
+                              <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            }
                            </div>
                          </td>
                        </tr>

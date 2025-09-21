@@ -34,4 +34,9 @@ export class Api {
   deletePool(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/pools/${id}`);
   }
+
+  // Admin: create a member user
+  createMember(data: { email: string; password: string; fullName: string; username?: string }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/users`, data);
+  }
 }

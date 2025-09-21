@@ -1,0 +1,38 @@
+<div class="modal-header">
+  <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Add Member</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+  
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <label class="form-label" for="email">Email</label>
+        <input id="email" type="email" class="form-control" formControlName="email" placeholder="member@example.com">
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label" for="fullName">Full name</label>
+        <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Member Name">
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label" for="password">Password</label>
+        <input id="password" type="password" class="form-control" formControlName="password" placeholder="At least 6 characters">
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label" for="username">Username (optional)</label>
+        <input id="username" type="text" class="form-control" formControlName="username" placeholder="member_username">
+      </div>
+    </div>
+
+    <div class="text-danger small mt-3" *ngIf="error">{{ error }}</div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-outline-secondary" (click)="cancel()" [disabled]="submitting">Cancel</button>
+  <button class="btn btn-primary" (click)="submit()" [disabled]="submitting">
+    <span class="spinner-border spinner-border-sm me-2" *ngIf="submitting"></span>
+    Create Member
+  </button>
+</div>
+
+

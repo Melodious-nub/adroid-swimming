@@ -5,6 +5,7 @@ import { Subject, of, takeUntil, debounceTime, distinctUntilChanged, switchMap, 
 import { Api } from '../../core/api';
 import { Pool } from '../../models/pool.model';
 import { AddPoolModal } from '../add-pool-modal/add-pool-modal';
+import { AddMemberModal } from '../add-member-modal/add-member-modal';
 import { PdfService } from '../../services/pdf.service';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
@@ -26,6 +27,7 @@ export class PoolList implements OnInit, OnDestroy {
   printingPdf: { [key: string]: boolean } = {};
   private destroy$ = new Subject<void>();
   private searchTerm$ = new Subject<string>();
+  isAdmin = false;
 
   constructor(
     private api: Api,
@@ -36,6 +38,8 @@ export class PoolList implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // console.log('PoolList component initialized');
+    const user = this.auth.getUser();
+    this.isAdmin = (user?.role || '').toLowerCase() === 'admin';
     this.loadPools();
 
     // Debounced search stream
@@ -119,6 +123,10 @@ export class PoolList implements OnInit, OnDestroy {
   }
 
   openEditModal(pool: Pool): void {
+    if (!this.isAdmin) {
+      Swal.fire({ icon: 'info', title: 'Only admins can edit', timer: 1600, showConfirmButton: false });
+      return;
+    }
     const modalRef = this.modalService.open(AddPoolModal, {
       size: 'xl',
       backdrop: false,
@@ -145,6 +153,10 @@ export class PoolList implements OnInit, OnDestroy {
   }
 
   deletePool(pool: Pool): void {
+    if (!this.isAdmin) {
+      Swal.fire({ icon: 'info', title: 'Only admins can delete', timer: 1600, showConfirmButton: false });
+      return;
+    }
     Swal.fire({
       title: 'Delete pool?',
       text: `This will permanently delete ${pool.homeOwnerName}'s pool record.`,
@@ -231,5 +243,25 @@ export class PoolList implements OnInit, OnDestroy {
       timer: 1800,
       showConfirmButton: false
     });
+  }
+
+  openAddMemberModal(): void {
+    if (!this.isAdmin) {
+      Swal.fire({ icon: 'info', title: 'Only admins can add members', timer: 1600, showConfirmButton: false });
+      return;
+    }
+    const modalRef = this.modalService.open(AddMemberModal, {
+      size: 'lg',
+      backdrop: 'static',
+      keyboard: false
+    });
+    modalRef.result.then(
+      (result) => {
+        if (result === 'created') {
+          this.toastSuccess('Member created');
+        }
+      },
+      () => {}
+    );
   }
 }
