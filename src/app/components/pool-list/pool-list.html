@@ -105,13 +105,13 @@
                               <button class="btn btn-outline-primary" (click)="openEditModal(pool)" title="Edit">
                                <i class="fas fa-edit"></i>
                               </button>
-                            }
-                             <button class="btn btn-outline-success" 
+                              <button class="btn btn-outline-success" 
                                      (click)="generatePdf(pool)" 
                                      [disabled]="downloadingPdf[pool.id!]"
                                      title="Download PDF">
                                <i class="fas" [class.fa-download]="!downloadingPdf[pool.id!]" [class.fa-spinner]="downloadingPdf[pool.id!]" [class.fa-spin]="downloadingPdf[pool.id!]"></i>
                              </button>
+                            }
                              <button class="btn btn-outline-info" 
                                      (click)="printPdf(pool)" 
                                      [disabled]="printingPdf[pool.id!]"
