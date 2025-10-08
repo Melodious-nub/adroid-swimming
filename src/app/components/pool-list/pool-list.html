@@ -82,7 +82,9 @@
                        <th class="text-nowrap d-none d-lg-table-cell">State</th>
                        <th class="text-nowrap">Pool Size</th>
                        <th class="text-nowrap d-none d-lg-table-cell">Created</th>
-                       <th class="text-nowrap">Actions</th>
+                       @if (isAdmin) {
+                        <th class="text-nowrap">Actions</th>
+                       }
                      </tr>
                    </thead>
                    <tbody>
@@ -111,15 +113,13 @@
                                      title="Download PDF">
                                <i class="fas" [class.fa-download]="!downloadingPdf[pool.id!]" [class.fa-spinner]="downloadingPdf[pool.id!]" [class.fa-spin]="downloadingPdf[pool.id!]"></i>
                              </button>
-                            }
                              <button class="btn btn-outline-info" 
                                      (click)="printPdf(pool)" 
                                      [disabled]="printingPdf[pool.id!]"
                                      title="Print PDF">
                                <i class="fas" [class.fa-print]="!printingPdf[pool.id!]" [class.fa-spinner]="printingPdf[pool.id!]" [class.fa-spin]="printingPdf[pool.id!]"></i>
                              </button>
-                            @if (isAdmin) {
-                              <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
+                             <button class="btn btn-outline-danger" (click)="deletePool(pool)" title="Delete">
                                 <i class="fas fa-trash"></i>
                               </button>
                             }
